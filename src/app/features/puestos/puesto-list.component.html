@@ -1,0 +1,93 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Puestos</h2>
+    @if (esAdministrador()) {
+      <a routerLink="nuevo" class="btn btn-primary btn-sm">+ Nuevo puesto</a>
+    }
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Buscar por número, giro, socio o inquilino..."
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando puestos...
+    </div>
+  } @else if (puestosFiltrados().length === 0) {
+    <p class="text-muted">No hay puestos que coincidan con la búsqueda.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Número</th>
+            <th>Giro</th>
+            <th>Socio</th>
+            <th>Inquilino</th>
+            <th>Vigencia</th>
+            @if (esAdministrador()) {
+              <th class="text-end">Opciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (puesto of puestosFiltrados(); track puesto.id) {
+            <tr>
+              <td>{{ puesto.numero }}</td>
+              <td>{{ nombreGiro(puesto.giroId) }}</td>
+              <td>
+                @if (puesto.socioId) {
+                  {{ nombreSocio(puesto.socioId) }}
+                } @else {
+                  <span class="text-muted">Sin socio</span>
+                }
+              </td>
+              <td>{{ puesto.inquilinoNombre || '—' }}</td>
+              <td>
+                @if (puesto.fechaInicioVigencia || puesto.fechaFinVigencia) {
+                  {{ puesto.fechaInicioVigencia || '—' }} → {{ puesto.fechaFinVigencia || '—' }}
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+              @if (esAdministrador()) {
+                <td class="text-end">
+                  <a [routerLink]="[puesto.id]" class="btn btn-outline-secondary btn-sm me-1">
+                    Editar
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    [disabled]="eliminandoId() === puesto.id"
+                    (click)="eliminar(puesto)"
+                  >
+                    @if (eliminandoId() === puesto.id) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      Eliminar
+                    }
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

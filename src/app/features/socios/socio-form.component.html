@@ -1,0 +1,141 @@
+<div class="container-fluid" style="max-width: 640px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar socio' : 'Nuevo socio' }}</h2>
+    <a routerLink="/socios" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="codigo" class="form-label">Código</label>
+              <input
+                id="codigo"
+                type="text"
+                class="form-control"
+                formControlName="codigo"
+                [class.is-invalid]="f.codigo.invalid && f.codigo.touched"
+              />
+              @if (f.codigo.invalid && f.codigo.touched) {
+                <div class="invalid-feedback">
+                  @if (f.codigo.errors?.['required']) { El código es obligatorio. }
+                  @if (f.codigo.errors?.['maxlength']) { Máximo 20 caracteres. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="etapa" class="form-label">Etapa</label>
+              <input
+                id="etapa"
+                type="number"
+                min="1"
+                class="form-control"
+                formControlName="etapa"
+                [class.is-invalid]="f.etapa.invalid && f.etapa.touched"
+              />
+              @if (f.etapa.invalid && f.etapa.touched) {
+                <div class="invalid-feedback">
+                  La etapa es obligatoria y debe ser mayor a 0.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="nombres" class="form-label">Nombres</label>
+            <input
+              id="nombres"
+              type="text"
+              class="form-control"
+              formControlName="nombres"
+              [class.is-invalid]="f.nombres.invalid && f.nombres.touched"
+            />
+            @if (f.nombres.invalid && f.nombres.touched) {
+              <div class="invalid-feedback">
+                @if (f.nombres.errors?.['required']) { Los nombres son obligatorios. }
+                @if (f.nombres.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="apellidos" class="form-label">Apellidos</label>
+            <input
+              id="apellidos"
+              type="text"
+              class="form-control"
+              formControlName="apellidos"
+              [class.is-invalid]="f.apellidos.invalid && f.apellidos.touched"
+            />
+            @if (f.apellidos.invalid && f.apellidos.touched) {
+              <div class="invalid-feedback">
+                @if (f.apellidos.errors?.['required']) { Los apellidos son obligatorios. }
+                @if (f.apellidos.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="accion" class="form-label">Acción</label>
+              <input
+                id="accion"
+                type="text"
+                class="form-control"
+                formControlName="accion"
+                [class.is-invalid]="f.accion.invalid && f.accion.touched"
+              />
+              @if (f.accion.invalid && f.accion.touched) {
+                <div class="invalid-feedback">
+                  Máximo 50 caracteres.
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="fechaNacimiento" class="form-label">Fecha de nacimiento</label>
+              <input
+                id="fechaNacimiento"
+                type="date"
+                class="form-control"
+                formControlName="fechaNacimiento"
+                [class.is-invalid]="f.fechaNacimiento.invalid && f.fechaNacimiento.touched"
+              />
+              @if (f.fechaNacimiento.invalid && f.fechaNacimiento.touched) {
+                <div class="invalid-feedback">
+                  Debe ser una fecha pasada.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/socios" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

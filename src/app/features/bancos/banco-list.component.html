@@ -1,0 +1,79 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Bancos / cuentas bancarias</h2>
+    @if (esAdministrador()) {
+      <a routerLink="nuevo" class="btn btn-primary btn-sm">+ Nuevo banco</a>
+    }
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Buscar por nombre o número de cuenta..."
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando bancos...
+    </div>
+  } @else if (bancosFiltrados().length === 0) {
+    <p class="text-muted">No hay bancos que coincidan con la búsqueda.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>N° de cuenta</th>
+            <th>CCI</th>
+            <th>Moneda</th>
+            @if (esAdministrador()) {
+              <th class="text-end">Opciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (banco of bancosFiltrados(); track banco.id) {
+            <tr>
+              <td>{{ banco.nombre }}</td>
+              <td>{{ banco.numeroCuenta }}</td>
+              <td>{{ banco.cci || '—' }}</td>
+              <td><span class="badge text-bg-secondary">{{ banco.moneda }}</span></td>
+              @if (esAdministrador()) {
+                <td class="text-end">
+                  <a [routerLink]="[banco.id]" class="btn btn-outline-secondary btn-sm me-1">
+                    Editar
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    [disabled]="eliminandoId() === banco.id"
+                    (click)="eliminar(banco)"
+                  >
+                    @if (eliminandoId() === banco.id) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      Eliminar
+                    }
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

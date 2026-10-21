@@ -1,0 +1,108 @@
+<div class="container-fluid" style="max-width: 560px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar banco' : 'Nuevo banco' }}</h2>
+    <a routerLink="/bancos" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+              id="nombre"
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              [class.is-invalid]="f.nombre.invalid && f.nombre.touched"
+            />
+            @if (f.nombre.invalid && f.nombre.touched) {
+              <div class="invalid-feedback">
+                @if (f.nombre.errors?.['required']) { El nombre es obligatorio. }
+                @if (f.nombre.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-md-8 mb-3">
+              <label for="numeroCuenta" class="form-label">Número de cuenta</label>
+              <input
+                id="numeroCuenta"
+                type="text"
+                class="form-control"
+                formControlName="numeroCuenta"
+                [class.is-invalid]="f.numeroCuenta.invalid && f.numeroCuenta.touched"
+              />
+              @if (f.numeroCuenta.invalid && f.numeroCuenta.touched) {
+                <div class="invalid-feedback">
+                  @if (f.numeroCuenta.errors?.['required']) { El número de cuenta es obligatorio. }
+                  @if (f.numeroCuenta.errors?.['maxlength']) { Máximo 30 caracteres. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="moneda" class="form-label">Moneda</label>
+              <select
+                id="moneda"
+                class="form-select"
+                formControlName="moneda"
+                [class.is-invalid]="f.moneda.invalid && f.moneda.touched"
+              >
+                @for (m of monedas; track m) {
+                  <option [value]="m">{{ m }}</option>
+                }
+              </select>
+              @if (f.moneda.invalid && f.moneda.touched) {
+                <div class="invalid-feedback">
+                  La moneda es obligatoria.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="cci" class="form-label">CCI</label>
+            <input
+              id="cci"
+              type="text"
+              class="form-control"
+              formControlName="cci"
+              [class.is-invalid]="f.cci.invalid && f.cci.touched"
+            />
+            @if (f.cci.invalid && f.cci.touched) {
+              <div class="invalid-feedback">
+                Máximo 30 caracteres.
+              </div>
+            }
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/bancos" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

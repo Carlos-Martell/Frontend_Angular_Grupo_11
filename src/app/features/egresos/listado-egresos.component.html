@@ -1,0 +1,144 @@
+<div>
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row align-items-end mb-3">
+    <div class="col-auto">
+      <label for="mesEgresos" class="form-label">Mes</label>
+      <input
+        id="mesEgresos"
+        type="month"
+        class="form-control"
+        [ngModel]="mes()"
+        (ngModelChange)="mes.set($event)"
+      />
+    </div>
+
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" [disabled]="buscando()" (click)="buscar()">
+        @if (buscando()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Buscando...
+        } @else {
+          Buscar
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (seBusco() && !buscando()) {
+    @if (egresos().length === 0) {
+      <p class="text-muted">No hay egresos registrados en ese mes.</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>N° documento</th>
+              <th>Proveedor</th>
+              <th>Fecha</th>
+              <th>Importe</th>
+              <th>Estado</th>
+              <th class="text-end">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (egreso of egresos(); track egreso.id) {
+              <tr>
+                <td>{{ egreso.numeroDocumento }}</td>
+                <td>{{ egreso.proveedor }}</td>
+                <td>{{ egreso.fecha }}</td>
+                <td>{{ egreso.importe | number: '1.2-2' }}</td>
+                <td>
+                  @switch (egreso.estado) {
+                    @case ('PROCESADO') {
+                      <span class="badge text-bg-success">Procesado</span>
+                    }
+                    @case ('ANULADO') {
+                      <span class="badge text-bg-secondary">Anulado</span>
+                    }
+                    @default {
+                      <span class="badge text-bg-warning">Registrado</span>
+                    }
+                  }
+                </td>
+                <td class="text-end">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary btn-sm me-1"
+                    (click)="verDetalle(egreso)"
+                  >
+                    Ver
+                  </button>
+                  @if (egreso.estado === 'REGISTRADO') {
+                    <button
+                      type="button"
+                      class="btn btn-outline-success btn-sm me-1"
+                      [disabled]="accionEnCursoId() === egreso.id"
+                      (click)="procesar(egreso)"
+                    >
+                      Procesar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-outline-danger btn-sm"
+                      [disabled]="accionEnCursoId() === egreso.id"
+                      (click)="anular(egreso)"
+                    >
+                      Anular
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (egresoSeleccionado(); as egreso) {
+    <div class="card mt-3" style="max-width: 420px;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h3 class="h6 mb-0">Egreso {{ egreso.numeroDocumento }}</h3>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarDetalle()"></button>
+        </div>
+        <dl class="row mb-0 small">
+          <dt class="col-5">Proveedor</dt>
+          <dd class="col-7">{{ egreso.proveedor }}</dd>
+
+          <dt class="col-5">Fecha</dt>
+          <dd class="col-7">{{ egreso.fecha }}</dd>
+
+          <dt class="col-5">Importe</dt>
+          <dd class="col-7">{{ egreso.importe | number: '1.2-2' }}</dd>
+
+          <dt class="col-5">Estado</dt>
+          <dd class="col-7">{{ egreso.estado }}</dd>
+
+          @if (egreso.documentoAsociado) {
+            <dt class="col-5">Doc. asociado</dt>
+            <dd class="col-7">{{ egreso.documentoAsociado }}</dd>
+          }
+          @if (egreso.motivo) {
+            <dt class="col-5">Motivo</dt>
+            <dd class="col-7">{{ egreso.motivo }}</dd>
+          }
+          @if (egreso.usuarioId) {
+            <dt class="col-5">Usuario</dt>
+            <dd class="col-7">#{{ egreso.usuarioId }}</dd>
+          }
+          @if (egreso.comprobanteUrl) {
+            <dt class="col-5">Comprobante</dt>
+            <dd class="col-7">
+              <a [href]="egreso.comprobanteUrl" target="_blank" rel="noopener">Ver archivo</a>
+            </dd>
+          }
+        </dl>
+      </div>
+    </div>
+  }
+</div>

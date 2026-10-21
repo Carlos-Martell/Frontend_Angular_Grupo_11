@@ -1,0 +1,154 @@
+<div class="container-fluid" style="max-width: 640px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar puesto' : 'Nuevo puesto' }}</h2>
+    <a routerLink="/puestos" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="numero" class="form-label">Número</label>
+              <input
+                id="numero"
+                type="text"
+                class="form-control"
+                formControlName="numero"
+                [class.is-invalid]="f.numero.invalid && f.numero.touched"
+              />
+              @if (f.numero.invalid && f.numero.touched) {
+                <div class="invalid-feedback">
+                  @if (f.numero.errors?.['required']) { El número es obligatorio. }
+                  @if (f.numero.errors?.['maxlength']) { Máximo 20 caracteres. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="giroId" class="form-label">Giro comercial</label>
+              <select
+                id="giroId"
+                class="form-select"
+                formControlName="giroId"
+                [class.is-invalid]="f.giroId.invalid && f.giroId.touched"
+              >
+                <option [ngValue]="null" disabled>Seleccione un giro...</option>
+                @for (giro of giros(); track giro.id) {
+                  <option [ngValue]="giro.id">{{ giro.nombre }}</option>
+                }
+              </select>
+              @if (f.giroId.invalid && f.giroId.touched) {
+                <div class="invalid-feedback">
+                  El giro es obligatorio.
+                </div>
+              }
+              @if (giros().length === 0) {
+                <div class="form-text text-warning">
+                  No hay giros registrados. Cree uno primero.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="socioId" class="form-label">Socio (opcional)</label>
+            <select id="socioId" class="form-select" formControlName="socioId">
+              <option [ngValue]="null">Sin socio asociado</option>
+              @for (socio of socios(); track socio.id) {
+                <option [ngValue]="socio.id">{{ socio.codigo }} — {{ socio.nombres }} {{ socio.apellidos }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="inquilinoNombre" class="form-label">Nombre del inquilino</label>
+              <input
+                id="inquilinoNombre"
+                type="text"
+                class="form-control"
+                formControlName="inquilinoNombre"
+                [class.is-invalid]="f.inquilinoNombre.invalid && f.inquilinoNombre.touched"
+              />
+              @if (f.inquilinoNombre.invalid && f.inquilinoNombre.touched) {
+                <div class="invalid-feedback">
+                  Máximo 150 caracteres.
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="inquilinoDocumento" class="form-label">Documento del inquilino</label>
+              <input
+                id="inquilinoDocumento"
+                type="text"
+                class="form-control"
+                formControlName="inquilinoDocumento"
+                [class.is-invalid]="f.inquilinoDocumento.invalid && f.inquilinoDocumento.touched"
+              />
+              @if (f.inquilinoDocumento.invalid && f.inquilinoDocumento.touched) {
+                <div class="invalid-feedback">
+                  Máximo 20 caracteres.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="fechaInicioVigencia" class="form-label">Inicio de vigencia</label>
+              <input
+                id="fechaInicioVigencia"
+                type="date"
+                class="form-control"
+                formControlName="fechaInicioVigencia"
+                [class.is-invalid]="form.errors?.['vigenciaInvalida'] && f.fechaFinVigencia.touched"
+              />
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="fechaFinVigencia" class="form-label">Fin de vigencia</label>
+              <input
+                id="fechaFinVigencia"
+                type="date"
+                class="form-control"
+                formControlName="fechaFinVigencia"
+                [class.is-invalid]="form.errors?.['vigenciaInvalida'] && f.fechaFinVigencia.touched"
+              />
+              @if (form.errors?.['vigenciaInvalida'] && f.fechaFinVigencia.touched) {
+                <div class="invalid-feedback d-block">
+                  El fin de vigencia no puede ser anterior al inicio.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/puestos" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

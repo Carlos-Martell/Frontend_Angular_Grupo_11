@@ -1,0 +1,58 @@
+<div style="max-width: 560px;">
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  @if (resultado(); as resultado) {
+    <div
+      class="alert py-2"
+      [class.alert-success]="resultado.errores.length === 0"
+      [class.alert-warning]="resultado.errores.length > 0"
+      role="alert"
+    >
+      <div class="fw-semibold mb-1">
+        {{ resultado.registrados }} de {{ resultado.totalFilas }} fila(s) registradas correctamente.
+      </div>
+      @if (resultado.errores.length > 0) {
+        <ul class="mb-0 small">
+          @for (error of resultado.errores; track $index) {
+            <li>{{ error }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
+
+  <div class="mb-3">
+    <label for="archivoEgresos" class="form-label">Archivo (.xlsx o .csv)</label>
+    <input
+      id="archivoEgresos"
+      type="file"
+      class="form-control"
+      accept=".xlsx,.csv"
+      (change)="onArchivoSeleccionado($event)"
+    />
+    <div class="form-text">
+      Columnas esperadas: numeroDocumento, proveedor, fecha, importe, documentoAsociado, motivo.
+    </div>
+    @if (archivoSeleccionado(); as archivo) {
+      <div class="form-text">Seleccionado: {{ archivo.name }}</div>
+    }
+  </div>
+
+  @if (authService.sesion(); as sesion) {
+    <div class="form-text mb-2">
+      Se registrará con tu usuario: <strong>{{ sesion.nombres }} {{ sesion.apellidos }}</strong>
+    </div>
+  }
+
+  <button type="button" class="btn btn-primary" [disabled]="cargando()" (click)="subir()">
+    @if (cargando()) {
+      <span class="spinner-border spinner-border-sm me-2"></span> Subiendo...
+    } @else {
+      Subir archivo
+    }
+  </button>
+</div>

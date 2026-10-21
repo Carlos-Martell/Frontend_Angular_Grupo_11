@@ -1,0 +1,89 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Servicios cobrables</h2>
+    @if (esAdministrador()) {
+      <a routerLink="nuevo" class="btn btn-primary btn-sm">+ Nuevo servicio</a>
+    }
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Buscar por nombre..."
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando servicios...
+    </div>
+  } @else if (serviciosFiltrados().length === 0) {
+    <p class="text-muted">No hay servicios que coincidan con la búsqueda.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Nombre</th>
+            <th>Recurrencia</th>
+            <th>Costo</th>
+            <th>Cargo a</th>
+            <th>Consumo</th>
+            @if (esAdministrador()) {
+              <th class="text-end">Opciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (servicio of serviciosFiltrados(); track servicio.id) {
+            <tr>
+              <td>{{ servicio.nombre }}</td>
+              <td>{{ servicio.recurrencia }}</td>
+              <td>{{ servicio.moneda }} {{ servicio.costo | number: '1.2-2' }}</td>
+              <td><span class="badge text-bg-secondary">{{ servicio.cargoA }}</span></td>
+              <td>
+                @if (servicio.esConsumo) {
+                  <span class="badge text-bg-info">
+                    Sí (costo unit. {{ servicio.costoUnitario | number: '1.2-2' }})
+                  </span>
+                } @else {
+                  <span class="text-muted">No</span>
+                }
+              </td>
+              @if (esAdministrador()) {
+                <td class="text-end">
+                  <a [routerLink]="[servicio.id]" class="btn btn-outline-secondary btn-sm me-1">
+                    Editar
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    [disabled]="eliminandoId() === servicio.id"
+                    (click)="eliminar(servicio)"
+                  >
+                    @if (eliminandoId() === servicio.id) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      Eliminar
+                    }
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

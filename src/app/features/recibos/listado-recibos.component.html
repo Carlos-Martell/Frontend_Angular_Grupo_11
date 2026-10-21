@@ -1,0 +1,154 @@
+<div>
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row align-items-end mb-3">
+    <div class="col-auto">
+      <label for="tipoRecibo" class="form-label">Tipo</label>
+      <select
+        id="tipoRecibo"
+        class="form-select"
+        [ngModel]="tipo()"
+        (ngModelChange)="tipo.set($event)"
+      >
+        @for (t of tipos; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="col-auto">
+      <label for="desde" class="form-label">Desde</label>
+      <input
+        id="desde"
+        type="date"
+        class="form-control"
+        [ngModel]="desde()"
+        (ngModelChange)="desde.set($event)"
+      />
+    </div>
+
+    <div class="col-auto">
+      <label for="hasta" class="form-label">Hasta</label>
+      <input
+        id="hasta"
+        type="date"
+        class="form-control"
+        [ngModel]="hasta()"
+        (ngModelChange)="hasta.set($event)"
+      />
+    </div>
+
+    <div class="col-auto">
+      <button type="button" class="btn btn-primary" [disabled]="buscando()" (click)="buscar()">
+        @if (buscando()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Buscando...
+        } @else {
+          Buscar
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (seBusco() && !buscando()) {
+    @if (recibos().length === 0) {
+      <p class="text-muted">No se encontraron recibos para el filtro seleccionado.</p>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>Correlativo</th>
+              <th>Fecha</th>
+              <th>Monto</th>
+              <th>Referencia</th>
+              <th class="text-end">Opciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (recibo of recibos(); track recibo.id) {
+              <tr>
+                <td>{{ recibo.correlativo }}</td>
+                <td>{{ recibo.fecha }}</td>
+                <td>{{ recibo.monto | number: '1.2-2' }}</td>
+                <td>
+                  @if (recibo.depositante) {
+                    {{ recibo.depositante }}
+                  } @else if (recibo.cuentaId) {
+                    Cuenta #{{ recibo.cuentaId }}
+                  } @else if (recibo.bancoId) {
+                    Banco #{{ recibo.bancoId }}
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="verDetalle(recibo)">
+                    Ver voucher
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+
+  @if (cargandoDetalle()) {
+    <div class="text-center text-muted py-3">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando voucher...
+    </div>
+  }
+
+  @if (reciboSeleccionado(); as recibo) {
+    <div class="card mt-3" style="max-width: 420px;">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <h3 class="h6 mb-0">Voucher {{ recibo.correlativo }}</h3>
+          <button type="button" class="btn-close" aria-label="Cerrar" (click)="cerrarDetalle()"></button>
+        </div>
+        <dl class="row mb-0 small">
+          <dt class="col-5">Tipo</dt>
+          <dd class="col-7">{{ recibo.tipo }}</dd>
+
+          <dt class="col-5">Fecha</dt>
+          <dd class="col-7">{{ recibo.fecha }}</dd>
+
+          <dt class="col-5">Monto</dt>
+          <dd class="col-7">{{ recibo.monto | number: '1.2-2' }}</dd>
+
+          @if (recibo.cuentaId) {
+            <dt class="col-5">Cuenta</dt>
+            <dd class="col-7">#{{ recibo.cuentaId }}</dd>
+          }
+          @if (recibo.bancoId) {
+            <dt class="col-5">Banco</dt>
+            <dd class="col-7">#{{ recibo.bancoId }}</dd>
+          }
+          @if (recibo.depositante) {
+            <dt class="col-5">Depositante</dt>
+            <dd class="col-7">{{ recibo.depositante }}</dd>
+          }
+          @if (recibo.categoria) {
+            <dt class="col-5">Categoría</dt>
+            <dd class="col-7">{{ recibo.categoria }}</dd>
+          }
+          @if (recibo.concepto) {
+            <dt class="col-5">Concepto</dt>
+            <dd class="col-7">{{ recibo.concepto }}</dd>
+          }
+          @if (recibo.fechaDeposito) {
+            <dt class="col-5">Fecha de depósito</dt>
+            <dd class="col-7">{{ recibo.fechaDeposito }}</dd>
+          }
+          <dt class="col-5">Usuario</dt>
+          <dd class="col-7">#{{ recibo.usuarioId }}</dd>
+        </dl>
+      </div>
+    </div>
+  }
+</div>

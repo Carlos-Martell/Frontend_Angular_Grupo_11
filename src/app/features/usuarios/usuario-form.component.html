@@ -1,0 +1,155 @@
+<div class="container-fluid" style="max-width: 640px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
+    <a routerLink="/usuarios" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="username" class="form-label">Usuario</label>
+              <input
+                id="username"
+                type="text"
+                class="form-control"
+                formControlName="username"
+                autocomplete="username"
+                [class.is-invalid]="f.username.invalid && f.username.touched"
+              />
+              @if (f.username.invalid && f.username.touched) {
+                <div class="invalid-feedback">
+                  @if (f.username.errors?.['required']) { El usuario es obligatorio. }
+                  @if (f.username.errors?.['maxlength']) { Máximo 50 caracteres. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="password" class="form-label">
+                Contraseña
+                @if (esEdicion) {
+                  <span class="text-muted fw-normal">(dejar vacío para no cambiarla)</span>
+                }
+              </label>
+              <input
+                id="password"
+                type="password"
+                class="form-control"
+                formControlName="password"
+                autocomplete="new-password"
+                [class.is-invalid]="f.password.invalid && f.password.touched"
+              />
+              @if (f.password.invalid && f.password.touched) {
+                <div class="invalid-feedback">
+                  @if (f.password.errors?.['required']) { La contraseña es obligatoria. }
+                  @if (f.password.errors?.['minlength']) { Mínimo 6 caracteres. }
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="nombres" class="form-label">Nombres</label>
+            <input
+              id="nombres"
+              type="text"
+              class="form-control"
+              formControlName="nombres"
+              [class.is-invalid]="f.nombres.invalid && f.nombres.touched"
+            />
+            @if (f.nombres.invalid && f.nombres.touched) {
+              <div class="invalid-feedback">
+                @if (f.nombres.errors?.['required']) { Los nombres son obligatorios. }
+                @if (f.nombres.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="apellidos" class="form-label">Apellidos</label>
+            <input
+              id="apellidos"
+              type="text"
+              class="form-control"
+              formControlName="apellidos"
+              [class.is-invalid]="f.apellidos.invalid && f.apellidos.touched"
+            />
+            @if (f.apellidos.invalid && f.apellidos.touched) {
+              <div class="invalid-feedback">
+                @if (f.apellidos.errors?.['required']) { Los apellidos son obligatorios. }
+                @if (f.apellidos.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="email" class="form-label">Email</label>
+              <input
+                id="email"
+                type="email"
+                class="form-control"
+                formControlName="email"
+                [class.is-invalid]="f.email.invalid && f.email.touched"
+              />
+              @if (f.email.invalid && f.email.touched) {
+                <div class="invalid-feedback">
+                  @if (f.email.errors?.['email']) { Ingrese un email válido. }
+                  @if (f.email.errors?.['maxlength']) { Máximo 150 caracteres. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="rol" class="form-label">Rol</label>
+              <select
+                id="rol"
+                class="form-select"
+                formControlName="rol"
+                [class.is-invalid]="f.rol.invalid && f.rol.touched"
+              >
+                @for (r of roles; track r) {
+                  <option [value]="r">{{ r }}</option>
+                }
+              </select>
+              @if (f.rol.invalid && f.rol.touched) {
+                <div class="invalid-feedback">El rol es obligatorio.</div>
+              }
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input id="activo" type="checkbox" class="form-check-input" formControlName="activo" />
+            <label for="activo" class="form-check-label">Usuario activo</label>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/usuarios" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

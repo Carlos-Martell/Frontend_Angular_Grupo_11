@@ -1,0 +1,52 @@
+<div class="container-fluid">
+  <h2 class="h5 mb-3">Egresos</h2>
+
+  <ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'LISTADO'"
+        (click)="irA('LISTADO')"
+      >
+        Listado por mes
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'REGISTRO'"
+        (click)="irA('REGISTRO')"
+      >
+        Registrar egreso
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'MASIVO'"
+        (click)="irA('MASIVO')"
+      >
+        Carga masiva
+      </button>
+    </li>
+  </ul>
+
+  <div class="card">
+    <div class="card-body">
+      @switch (pestanaActiva()) {
+        @case ('LISTADO') {
+          <app-listado-egresos />
+        }
+        @case ('REGISTRO') {
+          <app-registro-egreso />
+        }
+        @case ('MASIVO') {
+          <app-carga-masiva-egresos />
+        }
+      }
+    </div>
+  </div>
+</div>

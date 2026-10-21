@@ -1,0 +1,87 @@
+<ng-template #navLinks>
+  <ul class="app-nav">
+    @for (item of navItems(); track item.path) {
+      <li class="app-nav__item">
+        <a
+          class="app-nav__link"
+          [routerLink]="item.path"
+          routerLinkActive="app-nav__link--active"
+          [routerLinkActiveOptions]="{ exact: !!item.exact }"
+          data-bs-dismiss="offcanvas"
+        >
+          <app-nav-icon [name]="item.icon" />
+          <span>{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+</ng-template>
+
+<a class="visually-hidden-focusable app-skip-link" href="#main-content">Saltar al contenido</a>
+
+<div class="app-shell">
+  <header class="app-header">
+    <button
+      type="button"
+      class="app-header__toggle d-lg-none"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#appSidebar"
+      aria-controls="appSidebar"
+      aria-label="Abrir menú de navegación"
+    >
+      <app-nav-icon name="menu" />
+    </button>
+
+    <a class="app-header__brand" routerLink="/">
+      <span class="app-header__brand-mark">GC</span>
+      <span class="app-header__brand-text d-none d-sm-inline">
+        Sistema de Gestión Administrativa y de Caja
+      </span>
+    </a>
+
+    @if (sesion(); as usuario) {
+      <div class="app-header__user">
+        <div class="app-header__user-avatar" aria-hidden="true">
+          {{ iniciales(usuario.nombres, usuario.apellidos) }}
+        </div>
+        <div class="app-header__user-info d-none d-sm-flex">
+          <span class="app-header__user-name">{{ usuario.nombres }} {{ usuario.apellidos }}</span>
+          <span class="app-header__user-role">{{ usuario.rol }}</span>
+        </div>
+        <button
+          type="button"
+          class="app-header__logout"
+          title="Cerrar sesión"
+          aria-label="Cerrar sesión"
+          (click)="logout()"
+        >
+          <app-nav-icon name="logout" />
+        </button>
+      </div>
+    }
+  </header>
+
+  <div class="app-body">
+    <aside class="app-sidebar d-none d-lg-block">
+      <nav aria-label="Navegación principal">
+        <ng-container [ngTemplateOutlet]="navLinks" />
+      </nav>
+    </aside>
+
+    <div class="offcanvas offcanvas-start app-sidebar-offcanvas" tabindex="-1" id="appSidebar" aria-labelledby="appSidebarLabel">
+      <div class="offcanvas-header">
+        <h2 class="offcanvas-title h6 mb-0" id="appSidebarLabel">Menú</h2>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      </div>
+      <div class="offcanvas-body p-0">
+        <nav aria-label="Navegación principal (mobile)">
+          <ng-container [ngTemplateOutlet]="navLinks" />
+        </nav>
+      </div>
+    </div>
+
+    <main class="app-content" id="main-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

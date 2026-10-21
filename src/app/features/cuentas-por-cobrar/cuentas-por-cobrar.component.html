@@ -1,0 +1,65 @@
+<div class="container-fluid">
+  <h2 class="h5 mb-3">Cuentas por cobrar</h2>
+
+  <ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'CONSULTA'"
+        (click)="irA('CONSULTA')"
+      >
+        Consultar y gestionar
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'PUESTOS'"
+        (click)="irA('PUESTOS')"
+      >
+        Generar por puesto
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'CONSUMO'"
+        (click)="irA('CONSUMO')"
+      >
+        Generar por consumo
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'SOCIOS'"
+        (click)="irA('SOCIOS')"
+      >
+        Generar por socio
+      </button>
+    </li>
+  </ul>
+
+  <div class="card">
+    <div class="card-body">
+      @switch (pestanaActiva()) {
+        @case ('CONSULTA') {
+          <app-consulta-cuentas />
+        }
+        @case ('PUESTOS') {
+          <app-generar-cuentas-puestos />
+        }
+        @case ('CONSUMO') {
+          <app-generar-cuentas-consumo />
+        }
+        @case ('SOCIOS') {
+          <app-generar-cuentas-socios />
+        }
+      }
+    </div>
+  </div>
+</div>

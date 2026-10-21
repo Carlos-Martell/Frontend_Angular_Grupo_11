@@ -1,0 +1,70 @@
+<div class="container-fluid" style="max-width: 560px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar giro' : 'Nuevo giro' }}</h2>
+    <a routerLink="/giros" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+              id="nombre"
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              [class.is-invalid]="f.nombre.invalid && f.nombre.touched"
+            />
+            @if (f.nombre.invalid && f.nombre.touched) {
+              <div class="invalid-feedback">
+                @if (f.nombre.errors?.['required']) { El nombre es obligatorio. }
+                @if (f.nombre.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea
+              id="descripcion"
+              class="form-control"
+              rows="3"
+              formControlName="descripcion"
+              [class.is-invalid]="f.descripcion.invalid && f.descripcion.touched"
+            ></textarea>
+            @if (f.descripcion.invalid && f.descripcion.touched) {
+              <div class="invalid-feedback">
+                Máximo 255 caracteres.
+              </div>
+            }
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/giros" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

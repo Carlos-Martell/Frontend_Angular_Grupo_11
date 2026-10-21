@@ -1,0 +1,171 @@
+<div class="container-fluid" style="max-width: 640px;">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">{{ esEdicion ? 'Editar servicio' : 'Nuevo servicio' }}</h2>
+    <a routerLink="/servicios" class="btn btn-outline-secondary btn-sm">Volver</a>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando...
+    </div>
+  } @else {
+    <div class="card">
+      <div class="card-body">
+        @if (errorMensaje()) {
+          <div class="alert alert-danger py-2" role="alert">
+            {{ errorMensaje() }}
+          </div>
+        }
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input
+              id="nombre"
+              type="text"
+              class="form-control"
+              formControlName="nombre"
+              [class.is-invalid]="f.nombre.invalid && f.nombre.touched"
+            />
+            @if (f.nombre.invalid && f.nombre.touched) {
+              <div class="invalid-feedback">
+                @if (f.nombre.errors?.['required']) { El nombre es obligatorio. }
+                @if (f.nombre.errors?.['maxlength']) { Máximo 100 caracteres. }
+              </div>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="recurrencia" class="form-label">Recurrencia</label>
+              <select
+                id="recurrencia"
+                class="form-select"
+                formControlName="recurrencia"
+                [class.is-invalid]="f.recurrencia.invalid && f.recurrencia.touched"
+              >
+                @for (r of recurrencias; track r) {
+                  <option [value]="r">{{ r }}</option>
+                }
+              </select>
+              @if (f.recurrencia.invalid && f.recurrencia.touched) {
+                <div class="invalid-feedback">
+                  La recurrencia es obligatoria.
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="cargoA" class="form-label">Cargo a</label>
+              <select
+                id="cargoA"
+                class="form-select"
+                formControlName="cargoA"
+                [class.is-invalid]="f.cargoA.invalid && f.cargoA.touched"
+              >
+                @for (opcion of opcionesCargoA; track opcion) {
+                  <option [value]="opcion">{{ opcion }}</option>
+                }
+              </select>
+              @if (f.cargoA.invalid && f.cargoA.touched) {
+                <div class="invalid-feedback">
+                  Indique a quién se cobra el servicio.
+                </div>
+              }
+              <div class="form-text">Define si las cuentas se generan por socio o por puesto.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="costo" class="form-label">Costo</label>
+              <input
+                id="costo"
+                type="number"
+                step="0.01"
+                min="0"
+                class="form-control"
+                formControlName="costo"
+                [class.is-invalid]="f.costo.invalid && f.costo.touched"
+              />
+              @if (f.costo.invalid && f.costo.touched) {
+                <div class="invalid-feedback">
+                  @if (f.costo.errors?.['required']) { El costo es obligatorio. }
+                  @if (f.costo.errors?.['min']) { El costo no puede ser negativo. }
+                </div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="moneda" class="form-label">Moneda</label>
+              <select
+                id="moneda"
+                class="form-select"
+                formControlName="moneda"
+                [class.is-invalid]="f.moneda.invalid && f.moneda.touched"
+              >
+                @for (m of monedas; track m) {
+                  <option [value]="m">{{ m }}</option>
+                }
+              </select>
+              @if (f.moneda.invalid && f.moneda.touched) {
+                <div class="invalid-feedback">
+                  La moneda es obligatoria.
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="form-check mb-3">
+            <input
+              id="esConsumo"
+              type="checkbox"
+              class="form-check-input"
+              formControlName="esConsumo"
+            />
+            <label for="esConsumo" class="form-check-label">
+              Se factura por consumo (requiere lecturas inicial/final por puesto)
+            </label>
+          </div>
+
+          @if (requiereCostoUnitario) {
+            <div class="mb-3" style="max-width: 260px;">
+              <label for="costoUnitario" class="form-label">Costo unitario por consumo</label>
+              <input
+                id="costoUnitario"
+                type="number"
+                step="0.01"
+                min="0"
+                class="form-control"
+                formControlName="costoUnitario"
+                [class.is-invalid]="f.costoUnitario.invalid && f.costoUnitario.touched"
+              />
+              @if (f.costoUnitario.invalid && f.costoUnitario.touched) {
+                <div class="invalid-feedback">
+                  @if (f.costoUnitario.errors?.['required']) { El costo unitario es obligatorio si el servicio es por consumo. }
+                  @if (f.costoUnitario.errors?.['min']) { El costo unitario no puede ser negativo. }
+                </div>
+              }
+              <div class="form-text">
+                El importe de cada cuenta se calculará como (lectura final − lectura inicial) × costo unitario.
+              </div>
+            </div>
+          }
+
+          <div class="d-flex justify-content-end gap-2 mt-3">
+            <a routerLink="/servicios" class="btn btn-outline-secondary" [class.disabled]="guardando()">
+              Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+              @if (guardando()) {
+                <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+              } @else {
+                Guardar
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

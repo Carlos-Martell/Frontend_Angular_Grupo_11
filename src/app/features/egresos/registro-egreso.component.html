@@ -1,0 +1,129 @@
+<div style="max-width: 560px;">
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  @if (egresoRegistrado(); as egreso) {
+    <div class="alert alert-success py-2" role="alert">
+      Egreso registrado: <strong>{{ egreso.numeroDocumento }}</strong> por
+      {{ egreso.importe | number: '1.2-2' }} (estado: {{ egreso.estado }}).
+    </div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="numeroDocumento" class="form-label">N° de documento</label>
+        <input
+          id="numeroDocumento"
+          type="text"
+          class="form-control"
+          formControlName="numeroDocumento"
+          [class.is-invalid]="f.numeroDocumento.invalid && f.numeroDocumento.touched"
+        />
+        @if (f.numeroDocumento.invalid && f.numeroDocumento.touched) {
+          <div class="invalid-feedback">
+            @if (f.numeroDocumento.errors?.['required']) { El número de documento es obligatorio. }
+            @if (f.numeroDocumento.errors?.['maxlength']) { Máximo 30 caracteres. }
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="fecha" class="form-label">Fecha</label>
+        <input
+          id="fecha"
+          type="date"
+          class="form-control"
+          formControlName="fecha"
+          [class.is-invalid]="f.fecha.invalid && f.fecha.touched"
+        />
+        @if (f.fecha.invalid && f.fecha.touched) {
+          <div class="invalid-feedback">La fecha es obligatoria.</div>
+        }
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="proveedor" class="form-label">Proveedor</label>
+      <input
+        id="proveedor"
+        type="text"
+        class="form-control"
+        formControlName="proveedor"
+        [class.is-invalid]="f.proveedor.invalid && f.proveedor.touched"
+      />
+      @if (f.proveedor.invalid && f.proveedor.touched) {
+        <div class="invalid-feedback">
+          @if (f.proveedor.errors?.['required']) { El proveedor es obligatorio. }
+          @if (f.proveedor.errors?.['maxlength']) { Máximo 150 caracteres. }
+        </div>
+      }
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="importe" class="form-label">Importe</label>
+        <input
+          id="importe"
+          type="number"
+          step="0.01"
+          min="0.01"
+          class="form-control"
+          formControlName="importe"
+          [class.is-invalid]="f.importe.invalid && f.importe.touched"
+        />
+        @if (f.importe.invalid && f.importe.touched) {
+          <div class="invalid-feedback">
+            @if (f.importe.errors?.['required']) { El importe es obligatorio. }
+            @if (f.importe.errors?.['min']) { El importe debe ser mayor a 0. }
+          </div>
+        }
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label for="documentoAsociado" class="form-label">Documento asociado</label>
+        <input
+          id="documentoAsociado"
+          type="text"
+          class="form-control"
+          formControlName="documentoAsociado"
+          [class.is-invalid]="f.documentoAsociado.invalid && f.documentoAsociado.touched"
+        />
+        @if (f.documentoAsociado.invalid && f.documentoAsociado.touched) {
+          <div class="invalid-feedback">Máximo 255 caracteres.</div>
+        }
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="motivo" class="form-label">Motivo</label>
+      <textarea
+        id="motivo"
+        class="form-control"
+        rows="2"
+        formControlName="motivo"
+        [class.is-invalid]="f.motivo.invalid && f.motivo.touched"
+      ></textarea>
+      @if (f.motivo.invalid && f.motivo.touched) {
+        <div class="invalid-feedback">Máximo 255 caracteres.</div>
+      }
+    </div>
+
+    @if (authService.sesion(); as sesion) {
+      <div class="form-text mb-2">
+        Se registrará con tu usuario: <strong>{{ sesion.nombres }} {{ sesion.apellidos }}</strong>
+      </div>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+      @if (guardando()) {
+        <span class="spinner-border spinner-border-sm me-2"></span> Guardando...
+      } @else {
+        Registrar egreso
+      }
+    </button>
+  </form>
+</div>

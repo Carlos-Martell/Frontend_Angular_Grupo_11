@@ -1,0 +1,84 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Usuarios</h2>
+    <a routerLink="nuevo" class="btn btn-primary btn-sm">+ Nuevo usuario</a>
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Buscar por usuario, nombre o email..."
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando usuarios...
+    </div>
+  } @else if (usuariosFiltrados().length === 0) {
+    <p class="text-muted">No hay usuarios que coincidan con la búsqueda.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Usuario</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th class="text-end">Opciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuariosFiltrados(); track usuario.id) {
+            <tr>
+              <td>{{ usuario.username }}</td>
+              <td>{{ usuario.nombres }}</td>
+              <td>{{ usuario.apellidos }}</td>
+              <td>{{ usuario.email || '—' }}</td>
+              <td><span class="badge text-bg-secondary">{{ usuario.rol }}</span></td>
+              <td>
+                @if (usuario.activo === false) {
+                  <span class="badge text-bg-danger">Inactivo</span>
+                } @else {
+                  <span class="badge text-bg-success">Activo</span>
+                }
+              </td>
+              <td class="text-end">
+                <a [routerLink]="[usuario.id]" class="btn btn-outline-secondary btn-sm me-1">
+                  Editar
+                </a>
+                <button
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  [disabled]="eliminandoId() === usuario.id || usuario.id === usuarioIdPropio()"
+                  [title]="usuario.id === usuarioIdPropio() ? 'No podés eliminar tu propio usuario' : ''"
+                  (click)="eliminar(usuario)"
+                >
+                  @if (eliminandoId() === usuario.id) {
+                    <span class="spinner-border spinner-border-sm"></span>
+                  } @else {
+                    Eliminar
+                  }
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

@@ -1,0 +1,132 @@
+<div>
+  @if (cargandoCatalogos()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando catálogos...
+    </div>
+  } @else {
+    @if (errorMensaje()) {
+      <div class="alert alert-danger py-2" role="alert">
+        {{ errorMensaje() }}
+      </div>
+    }
+
+    @if (reciboGenerado(); as recibo) {
+      <div class="alert alert-success py-2" role="alert">
+        Canje registrado: recibo <strong>{{ recibo.correlativo }}</strong> por
+        {{ recibo.monto | number: '1.2-2' }}.
+      </div>
+    }
+
+    <div class="row align-items-end mb-3">
+      <div class="col-12 col-md-6">
+        <label for="socioIdCanje" class="form-label">Socio</label>
+        <select
+          id="socioIdCanje"
+          class="form-select"
+          [ngModel]="socioId()"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="socioId.set($event)"
+        >
+          <option [ngValue]="null" disabled>Seleccione un socio...</option>
+          @for (socio of socios(); track socio.id) {
+            <option [ngValue]="socio.id">{{ socio.codigo }} — {{ socio.nombres }} {{ socio.apellidos }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="socioId() === null || buscando()"
+          (click)="buscarCuentas()"
+        >
+          @if (buscando()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Buscando...
+          } @else {
+            Buscar cuentas pendientes
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (seBusco() && !buscando()) {
+      @if (cuentasPendientes().length === 0) {
+        <p class="text-muted">Este socio no tiene cuentas pendientes.</p>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+          <div class="mb-3">
+            <label class="form-label d-block">Cuenta a canjear</label>
+            @for (cuenta of cuentasPendientes(); track cuenta.id) {
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  [id]="'cuenta-' + cuenta.id"
+                  name="cuentaId"
+                  [value]="cuenta.id"
+                  formControlName="cuentaId"
+                />
+                <label class="form-check-label" [for]="'cuenta-' + cuenta.id">
+                  {{ nombreServicio(cuenta.servicioId) }} — {{ cuenta.periodo }} —
+                  {{ cuenta.monto | number: '1.2-2' }}
+                </label>
+              </div>
+            }
+            @if (f.cuentaId.invalid && f.cuentaId.touched) {
+              <div class="text-danger small mt-1">Seleccione una cuenta.</div>
+            }
+          </div>
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="bancoIdCanje" class="form-label">Banco</label>
+              <select
+                id="bancoIdCanje"
+                class="form-select"
+                formControlName="bancoId"
+                [class.is-invalid]="f.bancoId.invalid && f.bancoId.touched"
+              >
+                <option [ngValue]="null" disabled>Seleccione un banco...</option>
+                @for (banco of bancos(); track banco.id) {
+                  <option [ngValue]="banco.id">{{ banco.nombre }} ({{ banco.moneda }})</option>
+                }
+              </select>
+              @if (f.bancoId.invalid && f.bancoId.touched) {
+                <div class="invalid-feedback">El banco es obligatorio.</div>
+              }
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="fechaDepositoCanje" class="form-label">Fecha de depósito</label>
+              <input
+                id="fechaDepositoCanje"
+                type="date"
+                class="form-control"
+                formControlName="fechaDeposito"
+                [class.is-invalid]="f.fechaDeposito.invalid && f.fechaDeposito.touched"
+              />
+              @if (f.fechaDeposito.invalid && f.fechaDeposito.touched) {
+                <div class="invalid-feedback">La fecha de depósito es obligatoria.</div>
+              }
+            </div>
+          </div>
+
+          @if (authService.sesion(); as sesion) {
+            <div class="form-text mb-2">
+              Se registrará con tu usuario: <strong>{{ sesion.nombres }} {{ sesion.apellidos }}</strong>
+            </div>
+          }
+
+          <button type="submit" class="btn btn-success" [disabled]="canjeando()">
+            @if (canjeando()) {
+              <span class="spinner-border spinner-border-sm me-2"></span> Registrando...
+            } @else {
+              Registrar canje
+            }
+          </button>
+        </form>
+      }
+    }
+  }
+</div>

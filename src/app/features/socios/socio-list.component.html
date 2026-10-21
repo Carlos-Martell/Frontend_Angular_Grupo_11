@@ -1,0 +1,81 @@
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="h5 mb-0">Socios</h2>
+    @if (esAdministrador()) {
+      <a routerLink="nuevo" class="btn btn-primary btn-sm">+ Nuevo socio</a>
+    }
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="alert alert-danger py-2" role="alert">
+      {{ errorMensaje() }}
+    </div>
+  }
+
+  <div class="row mb-3">
+    <div class="col-12 col-md-4">
+      <input
+        type="text"
+        class="form-control form-control-sm"
+        placeholder="Buscar por código, nombres o apellidos..."
+        [ngModel]="filtro()"
+        (ngModelChange)="filtro.set($event)"
+      />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando socios...
+    </div>
+  } @else if (sociosFiltrados().length === 0) {
+    <p class="text-muted">No hay socios que coincidan con la búsqueda.</p>
+  } @else {
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Código</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Acción</th>
+            <th>Etapa</th>
+            @if (esAdministrador()) {
+              <th class="text-end">Opciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (socio of sociosFiltrados(); track socio.id) {
+            <tr>
+              <td>{{ socio.codigo }}</td>
+              <td>{{ socio.nombres }}</td>
+              <td>{{ socio.apellidos }}</td>
+              <td>{{ socio.accion || '—' }}</td>
+              <td>{{ socio.etapa }}</td>
+              @if (esAdministrador()) {
+                <td class="text-end">
+                  <a [routerLink]="[socio.id]" class="btn btn-outline-secondary btn-sm me-1">
+                    Editar
+                  </a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    [disabled]="eliminandoId() === socio.id"
+                    (click)="eliminar(socio)"
+                  >
+                    @if (eliminandoId() === socio.id) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else {
+                      Eliminar
+                    }
+                  </button>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

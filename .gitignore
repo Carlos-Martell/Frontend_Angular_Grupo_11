@@ -1,0 +1,20 @@
+# Dependencias
+/node_modules
+
+# Build
+/dist
+/out-tsc
+/.angular/cache
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Variables de entorno locales (si se agregan en el futuro)
+.env
+.env.local

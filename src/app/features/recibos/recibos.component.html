@@ -1,0 +1,65 @@
+<div class="container-fluid">
+  <h2 class="h5 mb-3">Recibos y cobranza</h2>
+
+  <ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'LISTADO'"
+        (click)="irA('LISTADO')"
+      >
+        Listado de recibos
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'PAGO'"
+        (click)="irA('PAGO')"
+      >
+        Procesar pago
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'CANJE'"
+        (click)="irA('CANJE')"
+      >
+        Canje bancario
+      </button>
+    </li>
+    <li class="nav-item">
+      <button
+        type="button"
+        class="nav-link"
+        [class.active]="pestanaActiva() === 'INGRESO'"
+        (click)="irA('INGRESO')"
+      >
+        Ingreso externo
+      </button>
+    </li>
+  </ul>
+
+  <div class="card">
+    <div class="card-body">
+      @switch (pestanaActiva()) {
+        @case ('LISTADO') {
+          <app-listado-recibos />
+        }
+        @case ('PAGO') {
+          <app-procesar-pago />
+        }
+        @case ('CANJE') {
+          <app-canje-banco />
+        }
+        @case ('INGRESO') {
+          <app-ingreso-externo />
+        }
+      }
+    </div>
+  </div>
+</div>

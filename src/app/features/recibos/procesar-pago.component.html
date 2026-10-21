@@ -1,0 +1,150 @@
+<div>
+  @if (cargandoCatalogos()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando catálogos...
+    </div>
+  } @else {
+    @if (errorMensaje()) {
+      <div class="alert alert-danger py-2" role="alert">
+        {{ errorMensaje() }}
+      </div>
+    }
+
+    @if (recibosGenerados(); as recibos) {
+      <div class="alert alert-success py-2" role="alert">
+        <div class="fw-semibold mb-1">Pago procesado: {{ recibos.length }} recibo(s) generado(s).</div>
+        <ul class="mb-0 small">
+          @for (recibo of recibos; track recibo.id) {
+            <li>{{ recibo.correlativo }} — {{ recibo.monto | number: '1.2-2' }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="row align-items-end mb-3">
+      <div class="col-auto">
+        <label class="form-label d-block">Buscar por</label>
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="tipo() === 'SOCIO'"
+            [class.btn-outline-primary]="tipo() !== 'SOCIO'"
+            (click)="cambiarTipo('SOCIO')"
+          >
+            Socio
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class.btn-primary]="tipo() === 'PUESTO'"
+            [class.btn-outline-primary]="tipo() !== 'PUESTO'"
+            (click)="cambiarTipo('PUESTO')"
+          >
+            Puesto
+          </button>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-5">
+        <label for="entidadIdPago" class="form-label">
+          {{ tipo() === 'SOCIO' ? 'Socio' : 'Puesto' }}
+        </label>
+        <select
+          id="entidadIdPago"
+          class="form-select"
+          [ngModel]="entidadId()"
+          (ngModelChange)="entidadId.set($event)"
+        >
+          <option [ngValue]="null" disabled>Seleccione...</option>
+          @if (tipo() === 'SOCIO') {
+            @for (socio of socios(); track socio.id) {
+              <option [ngValue]="socio.id">{{ socio.codigo }} — {{ socio.nombres }} {{ socio.apellidos }}</option>
+            }
+          } @else {
+            @for (puesto of puestos(); track puesto.id) {
+              <option [ngValue]="puesto.id">{{ puesto.numero }}</option>
+            }
+          }
+        </select>
+      </div>
+
+      <div class="col-auto">
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="entidadId() === null || buscando()"
+          (click)="buscar()"
+        >
+          @if (buscando()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Buscando...
+          } @else {
+            Buscar
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (seBusco() && !buscando()) {
+      @if (cuentasPendientes().length === 0) {
+        <p class="text-muted">No hay cuentas pendientes para la selección actual.</p>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-sm table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th style="width: 2rem;"></th>
+                <th>Servicio</th>
+                <th>Período</th>
+                <th>Monto</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (cuenta of cuentasPendientes(); track cuenta.id) {
+                <tr>
+                  <td>
+                    <input
+                      type="checkbox"
+                      class="form-check-input"
+                      [checked]="estaSeleccionada(cuenta.id)"
+                      [disabled]="procesando()"
+                      (change)="toggleSeleccion(cuenta.id, $any($event.target).checked)"
+                    />
+                  </td>
+                  <td>{{ nombreServicio(cuenta.servicioId) }}</td>
+                  <td>{{ cuenta.periodo }}</td>
+                  <td>{{ cuenta.monto | number: '1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <span class="fs-6">
+            Total seleccionado: <strong>{{ totalSeleccionado() | number: '1.2-2' }}</strong>
+          </span>
+        </div>
+
+        @if (authService.sesion(); as sesion) {
+          <div class="form-text mb-2">
+            Se registrará con tu usuario: <strong>{{ sesion.nombres }} {{ sesion.apellidos }}</strong>
+          </div>
+        }
+
+        <button
+          type="button"
+          class="btn btn-success"
+          [disabled]="cuentaIdsSeleccionadas().size === 0 || procesando()"
+          (click)="procesarPago()"
+        >
+          @if (procesando()) {
+            <span class="spinner-border spinner-border-sm me-2"></span> Procesando...
+          } @else {
+            Procesar pago
+          }
+        </button>
+      }
+    }
+  }
+</div>

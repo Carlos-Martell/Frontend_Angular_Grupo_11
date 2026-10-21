@@ -1,0 +1,110 @@
+<div>
+  @if (cargandoCatalogos()) {
+    <div class="text-center text-muted py-4">
+      <span class="spinner-border spinner-border-sm me-2"></span> Cargando catálogos...
+    </div>
+  } @else {
+    @if (errorMensaje()) {
+      <div class="alert alert-danger py-2" role="alert">
+        {{ errorMensaje() }}
+      </div>
+    }
+
+    @if (cuentasGeneradas()) {
+      <div class="alert alert-success py-2" role="alert">
+        Se generaron {{ cuentasGeneradas()!.length }} cuenta(s) correctamente.
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="servicioIdSocio" class="form-label">Servicio</label>
+          <select
+            id="servicioIdSocio"
+            class="form-select"
+            formControlName="servicioId"
+            [class.is-invalid]="f.servicioId.invalid && f.servicioId.touched"
+          >
+            <option [ngValue]="null" disabled>Seleccione un servicio...</option>
+            @for (servicio of servicios(); track servicio.id) {
+              <option [ngValue]="servicio.id">
+                {{ servicio.nombre }} ({{ servicio.moneda }} {{ servicio.costo | number: '1.2-2' }})
+              </option>
+            }
+          </select>
+          @if (f.servicioId.invalid && f.servicioId.touched) {
+            <div class="invalid-feedback">El servicio es obligatorio.</div>
+          }
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label for="periodoSocio" class="form-label">Período</label>
+          <input
+            id="periodoSocio"
+            type="text"
+            class="form-control"
+            placeholder="Ej: 2026-08"
+            formControlName="periodo"
+            [class.is-invalid]="f.periodo.invalid && f.periodo.touched"
+          />
+          @if (f.periodo.invalid && f.periodo.touched) {
+            <div class="invalid-feedback">
+              @if (f.periodo.errors?.['required']) { El período es obligatorio. }
+              @if (f.periodo.errors?.['maxlength']) { Máximo 20 caracteres. }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="mb-3" style="max-width: 260px;">
+        <label for="montoSocio" class="form-label">Monto (opcional)</label>
+        <input
+          id="montoSocio"
+          type="number"
+          step="0.01"
+          min="0"
+          class="form-control"
+          formControlName="monto"
+          [class.is-invalid]="f.monto.invalid && f.monto.touched"
+        />
+        @if (f.monto.invalid && f.monto.touched) {
+          <div class="invalid-feedback">El monto no puede ser negativo.</div>
+        }
+        <div class="form-text">Si se deja vacío, se usa el costo configurado en el servicio.</div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block">Etapas (opcional)</label>
+        @for (etapa of etapasDisponibles; track etapa) {
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'etapa-' + etapa"
+              [checked]="estaSeleccionada(etapa)"
+              (change)="toggleEtapa(etapa, $any($event.target).checked)"
+            />
+            <label class="form-check-label" [for]="'etapa-' + etapa">Etapa {{ etapa }}</label>
+          </div>
+        }
+        <div class="form-text">Si no se marca ninguna, incluye a socios de todas las etapas.</div>
+      </div>
+
+      <div class="form-check mb-3">
+        <input id="soloUnicos" type="checkbox" class="form-check-input" formControlName="soloUnicos" />
+        <label for="soloUnicos" class="form-check-label">
+          Limitar a socios únicos (evita repetidos por nombre y apellido)
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="generando()">
+        @if (generando()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Generando...
+        } @else {
+          Generar cuentas
+        }
+      </button>
+    </form>
+  }
+</div>
