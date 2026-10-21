@@ -25,8 +25,7 @@ pnpm start
 Por defecto sirve en `http://localhost:4200` y espera el backend en
 `http://localhost:8080` (ver `src/environments/environment.ts`).
 
-> ⚠️ El backend necesita permitir CORS desde `http://localhost:4200`
-> (ver observación 1 del resumen de API: falta el bean `CorsConfigurationSource`).
+
 
 ## Build de producción
 
@@ -102,7 +101,7 @@ todos los formularios—, colores del sidebar oscuro, etc.), más:
 
 - Un estado de foco visible consistente (`:focus-visible`) en toda la
   app, pensado para que se note también sobre el fondo oscuro del
-  sidebar (RNF-15).
+  sidebar .
 - Un *skip link* (`Saltar al contenido`, oculto hasta que recibe foco por
   teclado) que salta directo a `#main-content`, para no obligar a
   tabular por los ~10 links del sidebar en cada página.
@@ -146,8 +145,8 @@ Implementados end-to-end, siguiendo siempre el mismo patrón:
   `/api/socios`, `/api/giros`, `/api/bancos`. `SocioService` además expone
   `listarPorEtapas()` y `obtenerResumen()`.
 - **Listado** (`<entidad>-list.component`): tabla Bootstrap, filtro de
-  texto en cliente (RNF-07), botón "Nuevo", "Editar" por fila y "Eliminar"
-  con confirmación (RF-07) y feedback de carga/error (RNF-08).
+  texto en cliente , botón "Nuevo", "Editar" por fila y "Eliminar"
+  con confirmación  y feedback de carga/error .
 - **Formulario** (`<entidad>-form.component`): un solo componente para
   crear y editar (según el parámetro de ruta `:id`, o `nuevo`), reactive
   forms con validación visual `is-invalid`/`invalid-feedback` respetando
@@ -190,8 +189,7 @@ para ocultar el botón "Nuevo" y la columna "Editar"/"Eliminar" a un
 `OPERADOR_CAJA`. Ver la sección de autenticación más abajo para el
 detalle de cómo se maneja el `403` en el interceptor.
 
-## Cuentas por cobrar (RF-16 a RF-22)
-
+## Cuentas por cobrar 
 A diferencia de los catálogos anteriores, este módulo **no está
 restringido por rol**: tanto `ADMINISTRADOR` como `OPERADOR_CAJA` pueden
 generar, consultar, abonar, exonerar y calcular totales (ver resumen de
@@ -206,32 +204,32 @@ API, sección 1) — por eso ninguno de sus componentes usa
   contenedora con pestañas (`nav-pills` de Bootstrap, estado en un
   signal local — no son rutas hijas porque las 4 vistas no necesitan URL
   propia) que aloja a los siguientes cuatro subcomponentes:
-  - **`GenerarPuestosComponent`** (RF-16): selecciona servicio y período,
+  - **`GenerarPuestosComponent`** : selecciona servicio y período,
     y una lista de puestos con checkboxes (+ "Seleccionar todos"/"Limpiar").
     Genera una cuenta por cada puesto marcado, con el costo del servicio.
-  - **`GenerarConsumoComponent`** (RF-17): el select de servicio se filtra
+  - **`GenerarConsumoComponent`** : el select de servicio se filtra
     a los que tienen `esConsumo = true`; pide puesto, lectura inicial y
     final, con validación de que la final no sea menor a la inicial. El
     monto lo calcula el backend (diferencia × costo unitario).
-  - **`GenerarSociosComponent`** (RF-18 / RN-06): servicio, período, monto
+  - **`GenerarSociosComponent`** : servicio, período, monto
     opcional (si se omite usa el costo del servicio), checkboxes de etapas
     1/2/3 (opcional — sin marcar ninguna incluye todas) y "solo únicos"
     para evitar repetidos por nombre y apellido.
-  - **`ConsultaCuentasComponent`** (RF-19 a RF-22): buscador por
+  - **`ConsultaCuentasComponent`** : buscador por
     socio o puesto (resolviendo también el nombre del servicio de cada
     cuenta vía un mapa `Map<id, ServicioDTO>`, igual que se resuelven
     giro/socio en el listado de Puestos). Cada cuenta `PENDIENTE` tiene
-    checkbox de selección y botones "Abonar"/"Exonerar" (RF-21); las
+    checkbox de selección y botones "Abonar"/"Exonerar" ; las
     `ABONADA`/`EXONERADA` solo muestran su badge de estado, ya no se
     pueden volver a marcar. El botón "Calcular total" llama a
-    `POST /total` con las cuentas seleccionadas (RF-22).
+    `POST /total` con las cuentas seleccionadas .
 
 > El procesamiento del pago en sí (`POST /api/recibos/pagos`, que genera
 > el recibo) queda para el módulo de **Recibos**, que puede reusar
 > directamente `ConsultaCuentasComponent` (o su lógica de selección) como
 > paso previo a "Procesar pago".
 
-## Recibos y cobranza (RF-23 a RF-26, RF-29, RF-31)
+## Recibos y cobranza
 
 Tampoco está restringido por rol (mismo caso que Cuentas por cobrar).
 
@@ -241,26 +239,26 @@ Tampoco está restringido por rol (mismo caso que Cuentas por cobrar).
   `LocalDateTime` ISO) y `obtener(id)`, contra `/api/recibos/**`.
 - **`RecibosComponent`** (`features/recibos/`): misma idea de pestañas que
   `CuentasPorCobrarComponent` (signal local, sin rutas hijas):
-  - **`ProcesarPagoComponent`** (RF-23): busca cuentas `PENDIENTE` por
+  - **`ProcesarPagoComponent`** : busca cuentas `PENDIENTE` por
     socio o puesto (mismo patrón que la Consulta de Cuentas por cobrar),
     permite seleccionar varias con checkbox, muestra el total en vivo y
     llama a `POST /recibos/pagos`. Al terminar, vuelve a buscar para
     reflejar el nuevo estado `ABONADA` de las cuentas pagadas.
-  - **`CanjeBancoComponent`** (RF-24): busca las cuentas pendientes de UN
+  - **`CanjeBancoComponent`** : busca las cuentas pendientes de UN
     socio, elige **una sola** por radio button (el canje es 1 a 1), banco
     y fecha de depósito.
-  - **`IngresoExternoComponent`** (RF-25): formulario simple con
+  - **`IngresoExternoComponent`** : formulario simple con
     depositante, categoría, concepto (opcional), monto y fecha de
     depósito (opcional). Llama a `POST /recibos/ingresos-externos` con
     `tipo: 'INGRESO'` fijo.
-  - **`ListadoRecibosComponent`** (RF-29 / RF-31): filtro por `tipo`
+  - **`ListadoRecibosComponent`**: filtro por `tipo`
     (select) y rango `desde`/`hasta` (inputs `date`, convertidos a
     `LocalDateTime` con `T00:00:00`/`T23:59:59`). Cada fila tiene un botón
     "Ver voucher" que trae el detalle completo (`GET /recibos/{id}`) y lo
     muestra en un panel tipo comprobante (no hay generación de PDF real,
     es una vista de los campos del `ReciboDTO`).
 
-### ✅ `usuarioId` — limitación resuelta (antes requería `UsuarioIdFieldComponent`)
+### ✅ `usuarioId` 
 
 `ProcesarPagoRequest`, `CanjeBancoRequest` y `ReciboDTO` (ingresos
 externos) exigen un `usuarioId` numérico. **Esto ya no es un problema**:
@@ -288,7 +286,7 @@ el backend agregó el campo `id` a `LoginResponse` (login y el nuevo
   creada después de este cambio) no se hace ninguna llamada extra: el
   `id` ya está en `sessionStorage` desde el login.
 
-## Egresos (RF-27 a RF-30)
+## Egresos
 
 Tampoco está restringido por rol. La particularidad de este módulo es
 que, a diferencia de todo el resto de la API, **`usuarioId` no va en el
@@ -306,7 +304,7 @@ en vez de como parte del DTO.
   `anular()` y `procesar()` (`PATCH`).
 - **`EgresosComponent`** (`features/egresos/`): pestañas (mismo patrón
   que Cuentas por cobrar y Recibos):
-  - **`ListadoEgresosComponent`** (RF-30): selector de mes
+  - **`ListadoEgresosComponent`** : selector de mes
     (`<input type="month">`, precargado con el mes actual y buscado
     automáticamente al abrir la pestaña), tabla con badge de estado
     (`Registrado`/`Procesado`/`Anulado`), botón "Ver" (detalle inline,
@@ -314,9 +312,9 @@ en vez de como parte del DTO.
     para egresos en estado `REGISTRADO`, los botones "Procesar" y
     "Anular" (este último con confirmación, ya que la acción no se puede
     deshacer).
-  - **`RegistroEgresoComponent`** (RF-27): formulario con número de
+  - **`RegistroEgresoComponent`** : formulario con número de
     documento, proveedor, fecha, importe, documento asociado y motivo.
-  - **`CargaMasivaComponent`** (RF-28): `<input type="file">` (acepta
+  - **`CargaMasivaComponent`** : `<input type="file">` (acepta
     `.xlsx`/`.csv`) + botón "Subir archivo"; el resultado
     (`EgresoCargaMasivaResultado`) se muestra como éxito si no hay
     errores o como advertencia con el detalle de errores por fila si los
@@ -324,7 +322,7 @@ en vez de como parte del DTO.
   - Ambos formularios de escritura toman `usuarioId` directo de
     `authService.usuarioId()` (ver sección anterior).
 
-## Reportes (RF-32, RF-33)
+## Reportes
 
 Tampoco está restringido por rol. Todos los endpoints de este módulo son
 distintos al resto de la API: **devuelven un `.xlsx` binario, no JSON**.
@@ -363,22 +361,7 @@ distintos al resto de la API: **devuelven un `.xlsx` binario, no JSON**.
   intentar parsear el JSON, con un mensaje genérico de respaldo si
   tampoco eso funciona.
 
-### ⚠️ A confirmar con el equipo de backend: `Content-Disposition` y CORS
 
-El resumen de API solo confirma que el backend expone
-`allowedHeaders: "Authorization", "Content-Type"` en su configuración
-CORS — **no** confirma `exposedHeaders`. Para que el navegador deje leer
-`Content-Disposition` desde JavaScript en una respuesta cross-origin
-(Angular en `:4200`, API en `:8080`), el backend necesita agregarlo
-explícitamente a `Access-Control-Expose-Headers` (en Spring:
-`.exposedHeaders("Content-Disposition")` en el mismo
-`CorsConfigurationSource` que ya tienen armado). Si no lo hacen,
-`headers.get('Content-Disposition')` va a dar `null` en el navegador
-aunque el header sí venga en la respuesta cruda — por eso
-`extraerNombreArchivo()` siempre recibe un nombre por defecto como
-respaldo (`movimientos-diarios-2026-08-01.xlsx`, etc.) y la descarga
-nunca se rompe por esto, solo el nombre del archivo sería menos prolijo
-de lo que el backend querría darle.
 
 ## Usuarios (exclusivo de ADMINISTRADOR)
 
@@ -443,44 +426,9 @@ ruta además del ocultamiento de botones:
   prefijo `"Bearer "` — no se debe volver a anteponer). Ante un `401`
   (token ausente, inválido o expirado) limpia la sesión y redirige a `/login`.
 - **Guard** (`core/guards/auth.guard.ts`): protege las rutas que requieren
-  sesión iniciada (RF-02).
+  sesión iniciada.
 - **Componente de login** (`features/auth/login/`): card centrada con
   Bootstrap, formulario reactivo con validación visual (`is-invalid` /
   `invalid-feedback`), spinner de carga y mensaje de error.
 
-### Puntos a tener en cuenta (según el resumen de API)
 
-- El **token dura 1 hora** y no hay refresh token: cualquier operación
-  larga puede terminar en 401; el interceptor ya redirige a login en ese caso.
-- No existe endpoint de **logout** en el backend: cerrar sesión es solo
-  limpiar el storage local (ya implementado en `AuthService.logout()`).
-- **`GET /api/auth/me`** reconstruye la sesión (`id`/`username`/`nombres`/
-  `apellidos`/`rol`) a partir de los claims del token ya enviado —
-  requiere el header `Authorization`, no recibe body, y devuelve
-  `token: null` siempre (no reemite uno nuevo). El frontend casi nunca
-  necesita llamarlo directamente: la sesión completa ya se guarda en
-  `sessionStorage` desde el login. Se usa solo como respaldo en
-  `AuthService` para rehidratar el `id` de una sesión guardada por una
-  versión anterior de la app (ver la sección "`usuarioId` — limitación
-  resuelta" más arriba).
-- La API **sí aplica autorización por rol** a nivel de endpoint:
-  `/api/usuarios/**` → solo `ADMINISTRADOR`; en los catálogos (Socios,
-  Puestos, Giros, Bancos, Servicios) el `GET` es para ambos roles pero
-  `POST`/`PUT`/`DELETE` son solo `ADMINISTRADOR`. Un `OPERADOR_CAJA` que
-  intente una de esas acciones recibe `403 Forbidden`.
-  - `AuthService` expone `rol()`, `esAdministrador()` y `usuarioId()`
-    como señales, accesibles desde cualquier componente inyectando
-    `AuthService`.
-  - El interceptor (`auth.interceptor.ts`) normaliza el mensaje del 403:
-    usa `message` del `ErrorResponse` del backend si viene, o el mensaje
-    de respaldo fijo `"No tiene permisos para realizar esta acción."` si
-    no. No cierra sesión ni redirige en un 403 (a diferencia del 401):
-    el usuario sigue autenticado, solo no tiene el permiso.
-  - Los listados de Socios, Giros, Bancos, Puestos y Servicios ocultan
-    el botón "Nuevo" y la columna "Opciones" (editar/eliminar) cuando
-    `esAdministrador()` es `false`. Esto es solo UX: si un
-    `OPERADOR_CAJA` navega manualmente a `/socios/nuevo` (por URL
-    directa) igual verá el formulario y recibirá el 403 del backend al
-    guardar, con el mensaje ya normalizado por el interceptor. Si se
-    quiere bloquear también la navegación directa, se puede agregar un
-    guard por rol (`roleGuard`) análogo a `authGuard`.
