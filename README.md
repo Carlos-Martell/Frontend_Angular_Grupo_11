@@ -1,6 +1,6 @@
 # Sistema de Gestión Administrativa y de Caja — Frontend (Angular)
 
-Estructura inicial del proyecto (ProyectoGrupo5), generada a partir del
+Estructura inicial del proyecto (ProyectoGrupo11), generada a partir del
 documento de requisitos y del resumen de API. Angular 17+, componentes
 standalone, routing con `provideRouter`, Bootstrap 5 y formularios reactivos.
 
@@ -484,20 +484,3 @@ ruta además del ocultamiento de botones:
     guardar, con el mensaje ya normalizado por el interceptor. Si se
     quiere bloquear también la navegación directa, se puede agregar un
     guard por rol (`roleGuard`) análogo a `authGuard`.
-
-## Próximos pasos sugeridos
-
-1. **Todos los módulos de requisitos funcionales están implementados**:
-   catálogos (Socios, Giros, Bancos, Puestos, Servicios), Cuentas por
-   cobrar (generación + consulta/gestión), Recibos (pagos, canje,
-   ingresos externos, listado), Egresos (registro, carga masiva, listado
-   por mes, anular/procesar), Reportes (las 7 descargas de `.xlsx`) y
-   Usuarios (CRUD con password condicional), todos conectados en
-   `app.routes.ts` y en el sidebar.
-2. Confirmar con el equipo de backend el punto de CORS/`exposedHeaders`
-   para `Content-Disposition` en Reportes (ver esa sección más arriba).
-3. Con la app funcionalmente completa, los siguientes pasos naturales
-   son de calidad más que de features: agregar tests (unitarios de
-   servicios/guards, e2e de los flujos críticos como login → generar
-   cuenta → procesar pago), y revisar accesibilidad (RNF-15) en los
-   formularios más grandes (Servicios, Puestos, Cuentas por cobrar).
